@@ -20,7 +20,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server, {
     cors: {
-        origin: "http://116.197.135.158:11801",
+        origin: "*",
         methods: ["GET", "POST"],
         credentials: true,
         transports: ['websocket', 'polling'],
