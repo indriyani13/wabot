@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "axios": "^1.1.3",
+    "express": "^4.18.1",
+    "forever": "^4.0.3",
+    "mysql": "^2.18.1",
+    "qrcode": "^1.5.1",
+    "qrcode-terminal": "^0.12.0",
+    "qrcodejs": "^1.0.0",
+    "request": "^2.88.2",
+    "socket.io": "^4.5.1",
+    "whatsapp-web.js": "^1.19.2"
+  },
+  "name": "whatsapp",
+  "version": "1.0.0",
+  "description": "whatsapp js",
+  "main": "index-multiple.js",
+  "scripts": {
+    "start": "node index-multiple.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "fauzi",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.21"
+  }
+}
