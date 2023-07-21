@@ -27,7 +27,38 @@ const io = socketIO(server, {
     },
     allowEIO3: true
 });
+// var mysql = require('mysql');
+// var db = {
+//     host: "localhost",
+//     user: "root",
+//     password: "fauzi123",
+//     database: "waapi"
+// };
 
+
+// var connection;
+
+// function handleDisconnect() {
+//     connection = mysql.createConnection(db);
+//     connection.connect(function(err) {
+//         if (err) {
+//             console.log('error when connecting to db:', err);
+//             setTimeout(handleDisconnect, 2000);
+//         } else {
+//             console.log('db Connected');
+//         }
+//     });
+//     connection.on('error', function(err) {
+//         console.log('db error', err);
+//         if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+//             handleDisconnect();
+//         } else {
+//             console.log("[mysql error]", err);
+//         }
+//     });
+// }
+//
+// handleDisconnect();
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -166,15 +197,7 @@ const createSession = function(id, description) {
             console.log(`${id} Ready False`);
         } else {
             savedSessions[sessionIndex].ready = true;
-            const updqr = `UPDATE users SET ready = 1 WHERE id = '${id}'`;
-            connection.query(updqr, function(err, result) {
-              if (err) {
-                console.log('Not Connected');
-              } else {
-                console.log(`Update ${id}`);
 
-              }
-          });
               // setSessionsFile(savedSessions);
         }
 
@@ -282,7 +305,15 @@ const createSession = function(id, description) {
         const sessionIndex = savedSessions.findIndex(sess => sess.id == id);
         savedSessions.splice(sessionIndex, 1);
         // setSessionsFile(savedSessions);
+        const updqrlost = `UPDATE users SET ready = 0 WHERE id = '${id}'`;
+        connection.query(updqrlost, function(err, result) {
+          if (err) {
+            console.log('Not Connected');
+          } else {
+            console.log(`Update ${id}`);
 
+          }
+      });
         console.log(`User ${id} disconnected`);
         io.emit('remove-session', id);
     });
