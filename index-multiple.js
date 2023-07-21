@@ -20,14 +20,45 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server, {
     cors: {
-        origin: "*",
+        origin: "http://116.197.135.158:11801",
         methods: ["GET", "POST"],
         credentials: true,
         transports: ['websocket', 'polling'],
     },
     allowEIO3: true
 });
+var mysql = require('mysql');
+var db = {
+    host: "localhost",
+    user: "root",
+    password: "fauzi123",
+    database: "waapi"
+};
 
+
+var connection;
+
+function handleDisconnect() {
+    connection = mysql.createConnection(db);
+    connection.connect(function(err) {
+        if (err) {
+            console.log('error when connecting to db:', err);
+            setTimeout(handleDisconnect, 2000);
+        } else {
+            console.log('db Connected');
+        }
+    });
+    connection.on('error', function(err) {
+        console.log('db error', err);
+        if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+            handleDisconnect();
+        } else {
+            console.log("[mysql error]", err);
+        }
+    });
+}
+
+handleDisconnect();
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -40,22 +71,28 @@ app.get('/', (req, res) => {
     });
 });
 
-const sessions = './whatsapp-sessions.json';
+
+const sessions = [];
 const sessions_aktif = [];
-const createSessionsFileIfNotExists = function() {
-  if (!fs.existsSync(sessions)) {
-    try {
-      fs.writeFileSync(sessions, JSON.stringify([]));
-      console.log('Sessions file created successfully.');
-    } catch(err) {
-      console.log('Failed to create sessions file: ', err);
-    }
-  }
-}
-createSessionsFileIfNotExists();
-const getSessionsFile = function() {
-  return JSON.parse(fs.readFileSync(sessions));
-}
+var getUser = "SELECT * FROM users WHERE ready = 1";
+                  let queryUsers = connection.query(getUser, (err,response)=>{
+                    response.forEach(function(result) {
+
+                        if (result.ready = 1) {
+                            var status = true;
+                        }else{
+                            var status = false;
+                        }
+                      sessions.push({
+                        id:result.id,
+                        description : result.description,
+                        ready : status
+                      });
+                });
+
+                    const getSessionsFile = function() {
+                    return sessions;
+                    }
 
 
 
@@ -166,7 +203,15 @@ const createSession = function(id, description) {
             console.log(`${id} Ready False`);
         } else {
             savedSessions[sessionIndex].ready = true;
+            const updqr = `UPDATE users SET ready = 1 WHERE id = '${id}'`;
+            connection.query(updqr, function(err, result) {
+              if (err) {
+                console.log('Not Connected');
+              } else {
+                console.log(`Update ${id}`);
 
+              }
+          });
               // setSessionsFile(savedSessions);
         }
 
@@ -179,7 +224,14 @@ const createSession = function(id, description) {
 
       //Info Client.
         let info = client.info;
-
+        const dbinsert = `INSERT INTO qrscan (nomor,iduser,datescan) VALUES ('${info.wid.user}','${id}',now())`;
+        connection.query(dbinsert, function(err, result) {
+        if (err) {
+         console.log(dbinsert);
+        } else {
+           console.log("Berhasil Insert");
+         }
+   });
 
 
     });
@@ -274,7 +326,15 @@ const createSession = function(id, description) {
         const sessionIndex = savedSessions.findIndex(sess => sess.id == id);
         savedSessions.splice(sessionIndex, 1);
         // setSessionsFile(savedSessions);
+        const updqrlost = `UPDATE users SET ready = 0 WHERE id = '${id}'`;
+        connection.query(updqrlost, function(err, result) {
+          if (err) {
+            console.log('Not Connected');
+          } else {
+            console.log(`Update ${id}`);
 
+          }
+      });
         console.log(`User ${id} disconnected`);
         io.emit('remove-session', id);
     });
@@ -622,7 +682,7 @@ app.post('/send-media-msg', async (req, res) => {
 });
 
 
-
+});
 
 
 server.listen(port, function() {
