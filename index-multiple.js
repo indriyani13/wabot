@@ -274,15 +274,7 @@ const createSession = function(id, description) {
         const sessionIndex = savedSessions.findIndex(sess => sess.id == id);
         savedSessions.splice(sessionIndex, 1);
         // setSessionsFile(savedSessions);
-        const updqrlost = `UPDATE users SET ready = 0 WHERE id = '${id}'`;
-        connection.query(updqrlost, function(err, result) {
-          if (err) {
-            console.log('Not Connected');
-          } else {
-            console.log(`Update ${id}`);
 
-          }
-      });
         console.log(`User ${id} disconnected`);
         io.emit('remove-session', id);
     });
