@@ -27,38 +27,7 @@ const io = socketIO(server, {
     },
     allowEIO3: true
 });
-// var mysql = require('mysql');
-// var db = {
-//     host: "localhost",
-//     user: "root",
-//     password: "fauzi123",
-//     database: "waapi"
-// };
 
-
-// var connection;
-
-// function handleDisconnect() {
-//     connection = mysql.createConnection(db);
-//     connection.connect(function(err) {
-//         if (err) {
-//             console.log('error when connecting to db:', err);
-//             setTimeout(handleDisconnect, 2000);
-//         } else {
-//             console.log('db Connected');
-//         }
-//     });
-//     connection.on('error', function(err) {
-//         console.log('db error', err);
-//         if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-//             handleDisconnect();
-//         } else {
-//             console.log("[mysql error]", err);
-//         }
-//     });
-// }
-//
-// handleDisconnect();
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -83,7 +52,7 @@ const createSessionsFileIfNotExists = function() {
     }
   }
 }
-createSessionsFileIfNotExists()
+createSessionsFileIfNotExists();
 const getSessionsFile = function() {
   return JSON.parse(fs.readFileSync(sessions));
 }
@@ -661,7 +630,7 @@ app.post('/send-media-msg', async (req, res) => {
 });
 
 
-});
+
 
 
 server.listen(port, function() {
